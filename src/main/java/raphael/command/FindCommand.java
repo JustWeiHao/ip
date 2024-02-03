@@ -17,10 +17,9 @@ public class FindCommand extends Command {
      * @param tasks the task list.
      * @param ui the ui object.
      * @param storage the file I/O object.
-     * @throws RaphaelException exception exclusive to Raphael.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) throws RaphaelException {
+    public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showFindOutput(tasks.find(this.keyword));
     }
 }

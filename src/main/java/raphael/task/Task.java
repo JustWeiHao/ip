@@ -13,6 +13,11 @@ public class Task implements FileFormattable {
         this.isDone = false;
     }
 
+    /**
+     * Marks the current task as done.
+     *
+     * @return 0 if the current task is not done yet, and hence a successful operation can be carried out; -1 otherwise.
+     */
     public int check() {
         if (this.isDone) {
             return -1;
@@ -21,6 +26,12 @@ public class Task implements FileFormattable {
             return 0;
         }
     }
+
+    /**
+     * Marks the current task as undone.
+     *
+     * @return 0 if the current task is done, and hence a successful operation can be carried out; -1 otherwise.
+     */
     public int uncheck() {
         if (!this.isDone) {
             return -1;
@@ -29,8 +40,8 @@ public class Task implements FileFormattable {
             return 0;
         }
     }
-    public String getDescription() {
-        return this.description;
+    public boolean isContaining(String keyword) {
+        return this.description.contains(keyword);
     }
     public String toFileFormat() {
         return String.format("%d |&| %s", this.isDone ? 1 : 0, this.description);

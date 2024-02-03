@@ -2,9 +2,10 @@ package raphael.task;
 import java.util.ArrayList;
 import raphael.format.FileFormattable;
 import raphael.format.Formatter;
+import raphael.exception.RaphaelException;
 public class TaskList implements FileFormattable {
     private final ArrayList<Task> tasks;
-    public TaskList(String tasks) throws raphael.exception.RaphaelException {
+    public TaskList(String tasks) throws RaphaelException {
         this.tasks = new ArrayList<>();
         final String[] tasksArr = tasks.split("\n");
         for (String task : tasksArr) {
@@ -26,61 +27,108 @@ public class TaskList implements FileFormattable {
     public TaskList() {
         this.tasks = new ArrayList<>();
     }
+
+    /**
+     *
+     * @return the formatted string used to output the number of tasks in the current task list.
+     */
     public String getSize() {
         return String.format("You now have %d tasks in your list!", this.tasks.size());
     }
-    public int checkTask(int idx) throws raphael.exception.RaphaelException {
+    /**
+     * Marks the task indicated by idx and returns 0 if the operation is successful; -1 otherwise.
+     *
+     * @param idx the index of the task that need to be mark as done.
+     * @return 0 if the operation is successful, -1 otherwise.
+     * @throws raphael.exception.RaphaelException exception exclusive to Raphael.
+     */
+    public String checkTask(int idx) throws RaphaelException {
         if (idx < 0 || idx >= this.tasks.size()) {
-            throw new raphael.exception.RaphaelException(raphael.exception.RaphaelException.INVALID_TASK_INDEX);
+            throw new RaphaelException(RaphaelException.TYPE.INVALID_TASK_INDEX);
         } else {
             if(this.tasks.get(idx).check() == 0) {
-                System.out.printf("Hooray! Congrats on completing the following task!:\n"
+                return String.format("Hooray! Congrats on completing the following task!:\n"
                         + "\t%s\n", this.tasks.get(idx));
-                return 0;
             } else {
-                System.out.printf("Hmm. You seems to have completed the task:\n"
+                return String.format("Hmm. You seems to have completed the task:\n"
                         + "\t%s\n", this.tasks.get(idx));
-                return -1;
             }
         }
     }
-    public int uncheckTask(int idx) throws raphael.exception.RaphaelException {
+    /**
+     * Unmarks the task indicated by idx and returns 0 if the operation is successful; -1 otherwise.
+     *
+     * @param idx the index of the task that need to be unmark as done.
+     * @return 0 if the operation is successful, -1 otherwise.
+     * @throws raphael.exception.RaphaelException exception exclusive to Raphael.
+     */
+    public String uncheckTask(int idx) throws RaphaelException {
         if (idx < 0 || idx >= this.tasks.size()) {
-            throw new raphael.exception.RaphaelException(raphael.exception.RaphaelException.INVALID_TASK_INDEX);
+            throw new RaphaelException(RaphaelException.TYPE.INVALID_TASK_INDEX);
         } else {
             if(this.tasks.get(idx).uncheck() == 0) {
-                System.out.printf("Uh oh! Workload + 1 by having the following task:\n"
+                return String.format("Uh oh! Workload + 1 by having the following task:\n"
                         + "\t%s\n", this.tasks.get(idx));
-                return 0;
             } else {
-                System.out.printf("Hmm. You seems to have not complete the task before:\n"
+                return String.format("Hmm. You seems to have not complete the task before:\n"
                         + "\t%s\n", this.tasks.get(idx));
-                return -1;
             }
         }
     }
 
+    /**
+     * Adds the given task into the current task list.
+     *
+     * @param t the task that is needed tobe added.
+     */
+
     public void addTask(Task t) {
         this.tasks.add(t);
     }
-    public int deleteTask(int idx) throws raphael.exception.RaphaelException {
+
+    /**
+     * Deletes the task indicated by idx from the task list. Upon successful deletion, the method will return 0; -1
+     * otherwise.
+     *
+     * @param idx the index of task that has to be deleted.
+     * @return 0 if the deletion is successful; -1 otherwise.
+     * @throws raphael.exception.RaphaelException exception exclusive to Raphael.
+     */
+    public Task deleteTask(int idx) throws RaphaelException {
         if (idx < 0 || idx >= this.tasks.size()) {
-            throw new raphael.exception.RaphaelException(raphael.exception.RaphaelException.INVALID_TASK_INDEX);
+            throw new RaphaelException(RaphaelException.TYPE.INVALID_TASK_INDEX);
         } else {
             Task temp = this.tasks.get(idx);
             this.tasks.remove(idx);
-            System.out.printf("Alrigthy! I have deleted the following task for you:\n"
-                    + "\t%s\n", temp);
-            System.out.println(this.getSize());
-            return 0;
+            return temp;
         }
     }
-    public void listTasks() {
+
+    /**
+     * Lists all the task in the current task list.
+     */
+    public String listTasks() {
         if (this.tasks.isEmpty()) {
-            System.out.println("YAY! You have no tasks ongoing ^_^");
+            return "YAY! You have no tasks ongoing ^_^";
         } else {
-            System.out.println("Here are the tasks in your list:");
-            System.out.println(this);
+            return String.format("Here are the tasks in your list:\n%s", this);
+        }
+    }
+    public String find(String keyword) {
+        String res = "";
+        for(Task task : this.tasks) {
+            if (task.isContaining(keyword)) {
+                if (res.isEmpty()) {
+                    res = task.toString();
+                } else {
+                    res = String.format("%s\n%s", res, task);
+                }
+            }
+        }
+        if (res.isEmpty()) {
+            return "There are no matching tasks.";
+        } else {
+            return String.format("Here are the matching tasks in your list:\n\t%s", res);
         }
     }
     @Override
